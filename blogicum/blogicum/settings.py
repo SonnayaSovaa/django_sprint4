@@ -25,20 +25,26 @@ SECRET_KEY = 'django-insecure-8dub52t@dq%7itbvpv@9z&+(a=occ+ni6!*qj1gjon@b+d$w@3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'localhost',
+    '127.0.0.1',
+]
 
+CSRF_FAILURE_VIEW = 'core.views.csrf_failure' 
 
 # Application definition
 
 INSTALLED_APPS = [
     'pages.apps.PagesConfig',
     'blog.apps.BlogConfig',
+    'core.apps.CoreConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_bootstrap5',
 ]
 
 MIDDLEWARE = [
