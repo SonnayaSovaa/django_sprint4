@@ -23,15 +23,15 @@ def index(request):
 
 def post_detail(request, id):
     template = 'blog/detail.html'
-    post = get_object_or_404(
-        Post.objects,
-        is_published=True,
-        category__is_published=True,
-        pub_date__lte=datetime.now(),
-        pk=id
-    )
+    if id is not None: instance = get_object_or_404(Post, pk=id)
+    else: instance = None
 
-    context = {'post': post}
+    form = PostForm(request.POST or None, instance=instance,
+                    files=request.FILES or None)
+    context = {'form': form}
+    if form.is_valid():
+        
+        context.update({'form': form})
     return render(request, template, context)
 
 
@@ -69,7 +69,7 @@ def user_profile(request, profile_username):
     page_obj = paginator.get_page(page_number)
     
     context = {'profile': profile, 'page_obj': page_obj}
-    return render(request, template, context) 
+    return render(request, template, context)  
 
 
 def create_post(request, post_id=None):
@@ -78,12 +78,40 @@ def create_post(request, post_id=None):
     if post_id is not None: instance = get_object_or_404(Post, pk=post_id)
     else: instance = None
 
-    form = PostForm(request.POST or None, instance=instance)
+    form = PostForm(request.POST or None, instance=instance,
+                    files=request.FILES or None)
     context = {'form': form}
     if form.is_valid():
-        files=request.FILES or None,
         form.save()
     context.update({'form': form})
+    return render(request, template, context)
+
+
+def user_edit_profile(request, profile_username):
+    template = 'blog/profile.html'
+    profile = get_object_or_404(
+        User.objects, username=profile_username,
+    )
+    pages = Post.objects.filter(
+        author__username = profile_username
+    )
+
+    paginator = Paginator(pages, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
     
-    
+    context = {'profile': profile, 'page_obj': page_obj}
+    return render(request, template, context)  
+
+
+def add_comment(request, post_id=None):
+    template = 'blog/comment.html'
+    if post_id is not None: instance = get_object_or_404(Post, pk=post_id)
+    else: instance = None
+    form = PostForm(request.POST or None, instance=instance,
+                    files=request.FILES or None)
+    context = {'comment': form}
+    if form.is_valid():
+        form.save()
+    context.update({'comment': form})
     return render(request, template, context)
