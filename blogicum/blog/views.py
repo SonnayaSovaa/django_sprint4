@@ -14,14 +14,14 @@ def index(request):
     return render(request, template, context)
 
 
-def post_detail(request, id):
+def post_detail(request, post_detail_id):
     template = 'blog/detail.html'
     post = get_object_or_404(
         Post.objects,
         is_published=True,
         category__is_published=True,
         pub_date__lte=datetime.now(),
-        pk=id
+        pk=post_detail_id
     )
     context = {'post': post}
     return render(request, template, context)
