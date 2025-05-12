@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, render
-from blog.models import Category, Post
+from blog.models import Category, Post, User
+from django.core.paginator import Paginator
 from datetime import datetime
 
 
@@ -10,7 +11,12 @@ def index(request):
         category__is_published=True,
         pub_date__lte=datetime.now()
     ).order_by('-pub_date')[0:5]
-    context = {'post_list': post_list}
+    
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {'page_obj': page_obj}
     return render(request, template, context)
 
 
@@ -38,5 +44,33 @@ def category_posts(request, category_slug):
         category__slug=category_slug,
         pub_date__lte=datetime.now()
     )
-    context = {'post_list': post_list, 'category': category}
+
+    paginator = Paginator(post_list, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    context = {'page_obj': page_obj, 'category': category}
     return render(request, template, context)
+
+
+def user_profile(request, profile_username): # страница пользователя
+    template = 'blog/profile.html'
+    profile = get_object_or_404(
+        User.objects, username=profile_username,
+    )
+    pages = Post.objects.filter(
+        author__username = profile_username
+    )
+
+    paginator = Paginator(pages, 10)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    context = {'profile': profile, 'page_obj': page_obj}
+    return render(request, template, context) 
+
+
+def create_post(request): # страница пользователя
+    template = 'blog/create.html'
+    
+    return render(request, template)

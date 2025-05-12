@@ -11,7 +11,7 @@ urlpatterns = [
     path('category/', include('blog.urls')),
     path('pages/', include('pages.urls')),
     path('admin/', admin.site.urls),
-    
+    path('profile/', include('blog.urls')),
     path('auth/', include('django.contrib.auth.urls')),
 ]
 
