@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import path
 from . import views
 
@@ -11,4 +13,4 @@ urlpatterns = [
          views.category_posts, name='category_posts'),
     path('profile/<str:profile_username>/',
          views.user_profile, name='user_profile'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
