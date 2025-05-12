@@ -1,5 +1,6 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from blog.models import Category, Post, User
+from .forms import PostForm
 from django.core.paginator import Paginator
 from datetime import datetime
 
@@ -20,15 +21,16 @@ def index(request):
     return render(request, template, context)
 
 
-def post_detail(request, post_detail_id):
+def post_detail(request, id):
     template = 'blog/detail.html'
     post = get_object_or_404(
         Post.objects,
         is_published=True,
         category__is_published=True,
         pub_date__lte=datetime.now(),
-        pk=post_detail_id
+        pk=id
     )
+
     context = {'post': post}
     return render(request, template, context)
 
@@ -53,7 +55,7 @@ def category_posts(request, category_slug):
     return render(request, template, context)
 
 
-def user_profile(request, profile_username): # страница пользователя
+def user_profile(request, profile_username):
     template = 'blog/profile.html'
     profile = get_object_or_404(
         User.objects, username=profile_username,
@@ -70,7 +72,18 @@ def user_profile(request, profile_username): # страница пользова
     return render(request, template, context) 
 
 
-def create_post(request): # страница пользователя
+def create_post(request, post_id=None):
     template = 'blog/create.html'
+
+    if post_id is not None: instance = get_object_or_404(Post, pk=post_id)
+    else: instance = None
+
+    form = PostForm(request.POST or None, instance=instance)
+    context = {'form': form}
+    if form.is_valid():
+        files=request.FILES or None,
+        form.save()
+    context.update({'form': form})
     
-    return render(request, template)
+    
+    return render(request, template, context)

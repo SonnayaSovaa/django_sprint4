@@ -12,5 +12,5 @@ urlpatterns = [
     path('category/<slug:category_slug>/',
          views.category_posts, name='category_posts'),
     path('profile/<str:profile_username>/',
-         views.user_profile, name='user_profile'),
+         views.user_profile, name='profile'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
