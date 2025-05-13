@@ -9,7 +9,11 @@ template_str = 'registration/'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('posts/<int:id>/comment', views.add_comment, name='add_comment'),
+    path('posts/<int:id>/comment', views.post_comments, name='add_comment'),
+    path('posts/<int:id>/edit_comment/<comment_id>/', views.single_comment, name='edit_comment'),
+    path('posts/<int:id>/delete_comment/<comment_id>/', views.single_comment, name='delete_comment'),
+    path('posts/<post_id>/edit/', views.post_detail, name='edit_post'),
+    path('posts/<post_id>/delete/', views.post_detail, name='delete_post'),
     path('posts/<int:id>/', views.post_detail, name='post_detail'),
     path('posts/create/', views.create_post, name='create_post'),
     path('category/<slug:category_slug>/',

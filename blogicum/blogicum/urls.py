@@ -8,9 +8,9 @@ handler500 = 'core.views.server_error'
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('blog.urls')),
+    path('pages/', include('pages.urls')),
     path('posts/', include('blog.urls')),
     path('category/', include('blog.urls')),
-    path('pages/', include('pages.urls')),
     path('profile/', include('blog.urls')),
     path('edit/', include('blog.urls')),
     path('auth/', include('blog.urls')),

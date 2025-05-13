@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from blog.models import Category, Post, User
-from .forms import PostForm, UserForm
+from blog.models import Category, Comment, Post, User
+from .forms import CommentForm, PostForm, UserForm
 from django.core.paginator import Paginator
 from datetime import datetime
 
@@ -23,16 +23,17 @@ def index(request):
 
 def post_detail(request, id):
     template = 'blog/detail.html'
-    if id is not None: instance = get_object_or_404(Post, pk=id)
-    else: instance = None
-
-    form = PostForm(request.POST or None, instance=instance,
-                    files=request.FILES or None)
-    context = {'form': form}
+    post = get_object_or_404(Post, pk=id)
+    
+    form = CommentForm(request.POST or None)
+    context = {'post': post, 'form': form}
     if form.is_valid():
-        
-        context.update({'form': form})
+        form.save()
+    context.update({'form': form})
+
     return render(request, template, context)
+
+
 
 
 def category_posts(request, category_slug):
@@ -104,16 +105,28 @@ def user_edit_profile(request, profile_username):
     return render(request, template, context)  
 
 
-def add_comment(request, post_id=None):
+def post_comments(request, id=None):
     template = 'blog/comment.html'
-    if post_id is not None: instance = get_object_or_404(Post, pk=post_id)
-    else: instance = None
-    form = PostForm(request.POST or None, instance=instance,
-                    files=request.FILES or None)
-    context = {'comment': form}
+
+    form = CommentForm(request.POST)
+    comments = Comment.objects.filter(post_id__id=id)
+
+    context = {'form' : form, 'comments' : comments}
     if form.is_valid():
+        context.update({'form' : form})
         form.save()
-    context.update({'comment': form})
+    return render(request, template, context)
+
+
+def single_comment(request, id=None):
+    template = 'blog/comment.html'
+    if id is not None: instance = get_object_or_404(Post, pk=id)
+    else: instance = None
+    context = {'form' : form}
+    form = Comment(request.POST or None, instance=instance)
+    if form.is_valid():
+        context.update({'form' : form})
+        form.save()
     return render(request, template, context)
 
 
