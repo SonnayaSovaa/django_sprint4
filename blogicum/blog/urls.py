@@ -14,5 +14,29 @@ urlpatterns = [
          views.category_posts, name='category_posts'),
     path('profile/<str:profile_username>/',
          views.user_profile, name='profile'),
+    path('auth/registration/',
+         views.registration, name='registration'),
+
+    
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+'''
+path('auth/login/',
+         views.login, name='login'),
+    path('auth/logout/',
+         views.logout, name='logout'),
+    path('auth/password_change_done/',
+         views.password_change_done, name='password_change_done'),
+    path('auth/password_change_form/',
+         views.password_change_form, name='password_change_form'),
+    path('auth/password_reset_complete/',
+         views.password_reset_complete, name='password_reset_complete'),
+    path('auth/password_reset_confirm/',
+         views.password_reset_confirm, name='password_reset_confirm'),
+    path('auth/password_reset_done/',
+         views.password_reset_done, name='password_reset_done'),
+    path('auth/password_reset_form/',
+         views.password_reset_form, name='password_reset_form'),
+
+     '''

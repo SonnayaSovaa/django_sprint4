@@ -115,3 +115,56 @@ def add_comment(request, post_id=None):
         form.save()
     context.update({'comment': form})
     return render(request, template, context)
+
+
+def registration(request):
+    template = 'registration/registration_form.html'
+    instance = None
+    form = PostForm(request.POST or None, instance=instance)
+    context = {'form': form}
+    if form.is_valid():
+        form.save()
+    context.update({'form': form})
+    return render(request, template, context)
+
+'''
+
+def login(request):
+    template = 'registration/login.html'
+    return render(request, template)
+    
+
+def logout(request):
+    template = 'registration/logged_out.html'
+    return render(request, template)
+    
+
+def password_change_done(request):
+    template = 'registration/password_change_done.html'
+    return render(request, template)
+    
+
+def password_change_form(request):
+    template = 'registration/password_change_form.html'
+    return render(request, template)
+    
+
+def password_reset_complete(request):
+    template = 'registration/password_reset_complete.html'
+    return render(request, template)
+
+
+def password_reset_confirm(request):
+    template = 'registration/password_reset_confirm.html'
+    return render(request, template)
+    
+
+def password_reset_done(request):
+    template = 'registration/password_reset_done.html'
+    return render(request, template)
+    
+
+def password_reset_form(request):
+    template = 'registration/password_reset_form.html'
+    return render(request, template)
+'''
