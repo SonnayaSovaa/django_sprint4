@@ -9,13 +9,19 @@ template_str = 'registration/'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('posts/<int:id>/comment', views.post_comments, name='add_comment'),
-    path('posts/<int:id>/edit_comment/<comment_id>/', views.single_comment, name='edit_comment'),
-    path('posts/<int:id>/delete_comment/<comment_id>/', views.single_comment, name='delete_comment'),
-    path('posts/<post_id>/edit/', views.post_detail, name='edit_post'),
-    path('posts/<post_id>/delete/', views.post_detail, name='delete_post'),
-    path('posts/<int:id>/', views.post_detail, name='post_detail'),
+    path('posts/<int:post_id>/comment', views.post_comments, name='add_comment'),
+    path('posts/<int:post_id>/edit_comment/<comment_id>/', views.single_comment, name='edit_comment'),
+    path('posts/<int:post_id>/delete_comment/<comment_id>/', views.single_comment, name='delete_comment'),
+    
+    path('posts/<int:post_id>/edit/', views.post_detail, name='edit_post'),
+
+    path('posts/<int:post_id>/delete/', views.post_delete, name='delete_post'),
+
+    path('posts/<int:post_id>/', views.post_detail, name='post_detail'),
     path('posts/create/', views.create_post, name='create_post'),
+
+    path('edit_profile/', views.registration, name='edit_profile'),
+
     path('category/<slug:category_slug>/',
          views.category_posts, name='category_posts'),
     path('profile/<str:profile_username>/',
@@ -32,9 +38,9 @@ urlpatterns = [
     path('auth/password_change_done/',
          PasswordChangeDoneView.as_view(template_name=template_str+'password_change_done.html'),
          name='password_change_done'),
-    path('auth/password_change_form/',
+    path('auth/password_change/',
          PasswordChangeView.as_view(template_name=template_str+'password_change_form.html'),
-         name='password_change_form'),
+         name='password_change'),
     path('auth/password_reset_complete/',
          PasswordResetCompleteView.as_view(template_name=template_str+'password_reset_complete.html'),
          name='password_reset_complete'),
@@ -42,7 +48,7 @@ urlpatterns = [
          PasswordResetConfirmView.as_view(template_name=template_str+'password_reset_confirm.html'),
          name='password_reset_confirm'),
     path('auth/password_reset_done/',
-         PasswordResetDoneView.as_view(template_name='password_reset_done.html'),
+         PasswordResetDoneView.as_view(template_name=template_str+'password_reset_done.html'),
          name='password_reset_done'),
     path('auth/password_reset_form/',
          PasswordResetView.as_view(template_name=template_str+'password_reset_form.html'),

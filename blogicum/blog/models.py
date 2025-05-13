@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 from core.models import BaseModel
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -83,7 +84,7 @@ class Post(BaseModel):
     class Meta:
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
-
+        
 
 class Comment(BaseModel):
     text = models.CharField(
@@ -96,10 +97,4 @@ class Comment(BaseModel):
         on_delete=models.CASCADE,
         null=False,
         verbose_name='Автор комментария'
-    )
-    post = models.ForeignKey(
-        Post,
-        on_delete=models.CASCADE,
-        null=False,
-        verbose_name=''
     )

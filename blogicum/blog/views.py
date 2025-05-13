@@ -1,8 +1,10 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from blog.models import Category, Comment, Post, User
+from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 from .forms import CommentForm, PostForm, UserForm
 from django.core.paginator import Paginator
 from datetime import datetime
+from django.urls import reverse_lazy
 
 
 def index(request):
@@ -21,18 +23,31 @@ def index(request):
     return render(request, template, context)
 
 
-def post_detail(request, id):
+def post_detail(request, post_id):
     template = 'blog/detail.html'
-    post = get_object_or_404(Post, pk=id)
-    
+
+    instance = get_object_or_404(Post, pk=post_id)
+
     form = CommentForm(request.POST or None)
-    context = {'post': post, 'form': form}
+    context = {'post': instance, 'form': form}
     if form.is_valid():
         form.save()
     context.update({'form': form})
-
     return render(request, template, context)
 
+
+def post_delete(request, post_id):
+    template = 'blog/detail.html'
+    redirection = 'blog/index.html'
+
+    instance = get_object_or_404(Post, pk=post_id)
+    form = CommentForm(request.POST or None)
+    context = {'form' : form, 'post' : instance}
+
+    if request.method == 'POST':
+        instance.delete()
+        return redirect(redirection)
+    return render(request, template, context)
 
 
 
@@ -54,7 +69,23 @@ def category_posts(request, category_slug):
 
     context = {'page_obj': page_obj, 'category': category}
     return render(request, template, context)
+ 
 
+
+def create_post(request, post_id=None):
+    template = 'blog/create.html'
+    
+    if post_id is not None: instance = get_object_or_404(Post, pk=post_id)
+    else: instance = None
+
+    form = PostForm(request.POST or None, instance=instance,
+                    files=request.FILES or None)
+    context = {'form': form}
+    if form.is_valid():
+        form.save()
+        context.update({'form': form})
+        return redirect('contest/contest_list.html')
+    return render(request, template, context)
 
 def user_profile(request, profile_username):
     template = 'blog/profile.html'
@@ -70,55 +101,23 @@ def user_profile(request, profile_username):
     page_obj = paginator.get_page(page_number)
     
     context = {'profile': profile, 'page_obj': page_obj}
-    return render(request, template, context)  
+    return render(request, template, context) 
 
 
-def create_post(request, post_id=None):
-    template = 'blog/create.html'
-
-    if post_id is not None: instance = get_object_or_404(Post, pk=post_id)
-    else: instance = None
-
-    form = PostForm(request.POST or None, instance=instance,
-                    files=request.FILES or None)
-    context = {'form': form}
-    if form.is_valid():
-        form.save()
-    context.update({'form': form})
-    return render(request, template, context)
-
-
-def user_edit_profile(request, profile_username):
-    template = 'blog/profile.html'
-    profile = get_object_or_404(
-        User.objects, username=profile_username,
-    )
-    pages = Post.objects.filter(
-        author__username = profile_username
-    )
-
-    paginator = Paginator(pages, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    context = {'profile': profile, 'page_obj': page_obj}
-    return render(request, template, context)  
-
-
-def post_comments(request, id=None):
+def post_comments(request, post_id=None):
     template = 'blog/comment.html'
 
     form = CommentForm(request.POST)
-    comments = Comment.objects.filter(post_id__id=id)
+    comments = Comment.objects.order_by('created_at')
 
     context = {'form' : form, 'comments' : comments}
     if form.is_valid():
-        context.update({'form' : form})
         form.save()
+        context.update({'form' : form})
     return render(request, template, context)
 
 
-def single_comment(request, id=None):
+def single_comment(request, post_id=None, comment_id=None):
     template = 'blog/comment.html'
     if id is not None: instance = get_object_or_404(Post, pk=id)
     else: instance = None
@@ -134,5 +133,6 @@ def registration(request):
     template = 'registration/registration_form.html'
     form = UserForm(request.POST or None, instance=None)
     context = {'form': form}
-    if form.is_valid(): form.save()
+    if form.is_valid():
+        form.save()
     return render(request, template, context)

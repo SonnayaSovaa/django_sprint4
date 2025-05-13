@@ -12,7 +12,7 @@ urlpatterns = [
     path('posts/', include('blog.urls')),
     path('category/', include('blog.urls')),
     path('profile/', include('blog.urls')),
-    path('edit/', include('blog.urls')),
+    path('edit_profile/', include('blog.urls')),
     path('auth/', include('blog.urls')),
     path('auth/', include('django.contrib.auth.urls')),   
 ]
