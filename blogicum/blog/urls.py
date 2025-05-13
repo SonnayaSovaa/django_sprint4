@@ -9,15 +9,17 @@ template_str = 'registration/'
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('posts/<int:post_id>/comment', views.post_comments, name='add_comment'),
+    path('posts/<int:pk>/', views.PostDetailView.as_view(), name='post_detail'),
+    
+    path('posts/<int:post_id>/comment', views.add_comment, name='add_comment'),
     path('posts/<int:post_id>/edit_comment/<comment_id>/', views.single_comment, name='edit_comment'),
     path('posts/<int:post_id>/delete_comment/<comment_id>/', views.single_comment, name='delete_comment'),
     
-    path('posts/<int:post_id>/edit/', views.post_detail, name='edit_post'),
+    path('posts/<int:post_id>/edit/', views.post_delete, name='edit_post'), #!!!!!!
 
-    path('posts/<int:post_id>/delete/', views.post_delete, name='delete_post'),
+    path('posts/<int:post_id>/delete/', views.post_delete, name='delete_post'), #!!!!!
 
-    path('posts/<int:post_id>/', views.post_detail, name='post_detail'),
+    
     path('posts/create/', views.create_post, name='create_post'),
 
     path('edit_profile/', views.registration, name='edit_profile'),

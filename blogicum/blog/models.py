@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from core.models import BaseModel
 from django.urls import reverse
 
+
 User = get_user_model()
 
 
@@ -86,15 +87,24 @@ class Post(BaseModel):
         verbose_name_plural = 'Публикации'
         
 
-class Comment(BaseModel):
-    text = models.CharField(
-        max_length=256,
-        null=False,
-        verbose_name='Комментарий'
+class Comment(models.Model):
+    text = models.TextField(
+        'Текст комментария'
+        )
+    post = models.ForeignKey(
+        Post,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name='comment',
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        null=False,
         verbose_name='Автор комментария'
     )
+    
+    class Meta:
+        ordering = ('created_at',)
