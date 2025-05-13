@@ -5,8 +5,6 @@ from django.urls import include, path
 handler404 = 'core.views.page_not_found'
 handler500 = 'core.views.server_error'
 
-template_str = 'templates/registration/'
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('blog.urls')),
@@ -15,6 +13,6 @@ urlpatterns = [
     path('pages/', include('pages.urls')),
     path('profile/', include('blog.urls')),
     path('edit/', include('blog.urls')),
-    path('auth/registration', include('blog.urls')),
+    path('auth/', include('blog.urls')),
     path('auth/', include('django.contrib.auth.urls')),   
 ]
