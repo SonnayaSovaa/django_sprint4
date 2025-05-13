@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from blog.models import Category, Post, User
-from .forms import PostForm
+from .forms import PostForm, UserForm
 from django.core.paginator import Paginator
 from datetime import datetime
 
@@ -119,52 +119,7 @@ def add_comment(request, post_id=None):
 
 def registration(request):
     template = 'registration/registration_form.html'
-    instance = None
-    form = PostForm(request.POST or None, instance=instance)
+    form = UserForm(request.POST or None, instance=None)
     context = {'form': form}
-    if form.is_valid():
-        form.save()
-    context.update({'form': form})
+    if form.is_valid(): form.save()
     return render(request, template, context)
-
-'''
-
-def login(request):
-    template = 'registration/login.html'
-    return render(request, template)
-    
-
-def logout(request):
-    template = 'registration/logged_out.html'
-    return render(request, template)
-    
-
-def password_change_done(request):
-    template = 'registration/password_change_done.html'
-    return render(request, template)
-    
-
-def password_change_form(request):
-    template = 'registration/password_change_form.html'
-    return render(request, template)
-    
-
-def password_reset_complete(request):
-    template = 'registration/password_reset_complete.html'
-    return render(request, template)
-
-
-def password_reset_confirm(request):
-    template = 'registration/password_reset_confirm.html'
-    return render(request, template)
-    
-
-def password_reset_done(request):
-    template = 'registration/password_reset_done.html'
-    return render(request, template)
-    
-
-def password_reset_form(request):
-    template = 'registration/password_reset_form.html'
-    return render(request, template)
-'''

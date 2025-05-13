@@ -20,7 +20,7 @@ urlpatterns = [
          views.registration, name='registration'),
 
     path('auth/login/',
-         LoginView.as_view(template_name='login.html'),
+         LoginView.as_view(template_name=template_str+'login.html'),
          name='login'),
     path('auth/logout/',
          LogoutView.as_view(template_name=template_str+'logged_out.html'),
@@ -43,6 +43,4 @@ urlpatterns = [
     path('auth/password_reset_form/',
          PasswordResetView.as_view(template_name=template_str+'password_reset_form.html'),
          name='password_reset_form'),
-
-
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
