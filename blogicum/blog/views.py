@@ -146,7 +146,7 @@ def user_profile(request, profile_username):
         User.objects, username=profile_username,
     )
     post_list = Post.objects.filter(
-            author__username = profile_username
+        author__username=profile_username
     )
     if request.user.username != profile_username:
         post_list = publication_check(post_list)
