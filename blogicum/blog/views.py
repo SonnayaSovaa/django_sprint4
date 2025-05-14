@@ -50,16 +50,15 @@ def create_edit_post(request, post_id=None):
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
     context = {'form': form, 'post': instance, 'user': request.user.username}
-    if instance is not None and instance.author == request.user.username:
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            context.update({'form': form})
-            if post_id is None:
-                return redirect('blog:profile', request.user.username)
-            else:
-                return redirect('blog:post_detail', pk=post_id)
+    if form.is_valid():
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
+        context.update({'form': form})
+        if post_id is None:
+            return redirect('blog:profile', request.user.username)
+        else:
+            return redirect('blog:post_detail', pk=post_id)
     return render(request, template, context)
 
 
@@ -94,7 +93,7 @@ def add_comment(request, post_id):
     if form.is_valid():
         comment = form.save(commit=False)
         comment.author = request.user
-        comment.post = get_object_or_404(Post, pk=post_id)
+        comment.post = get_object_or_404(Post.objects, pk=post_id)
         comment.save()
     return redirect('blog:post_detail', pk=post_id)
 
@@ -102,8 +101,8 @@ def add_comment(request, post_id):
 @login_required
 def edit_comment(request, post_id, comment_id):
     template = 'blog/comment.html'
-    instance = get_object_or_404(Comment, pk=comment_id)
-    form = CommentForm(request.POST, instance=instance)
+    instance = get_object_or_404(Comment.objects, pk=comment_id)
+    form = CommentForm(request.POST or None, instance=instance)
     context = {'form': form, 'comment': instance}
     if form.is_valid():
         form.save()
@@ -115,7 +114,7 @@ def edit_comment(request, post_id, comment_id):
 @login_required
 def delete_comment(request, post_id, comment_id):
     template = 'blog/comment.html'
-    instance = get_object_or_404(Comment, pk=comment_id)
+    instance = get_object_or_404(Comment.objects, pk=comment_id)
     context = {'comment': instance}
     if request.method == 'POST':
         instance.delete()
