@@ -19,10 +19,9 @@ class UserForm(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
+    text = forms.CharField(widget=forms.Textarea)
 
     class Meta:
         model = Comment
         fields = ['text']
-        widgets = {
-            'text': forms.Textarea()
-        }
+
