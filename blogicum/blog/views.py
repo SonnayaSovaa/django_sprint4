@@ -65,22 +65,6 @@ def post_delete(request, post_id):
         return redirect('blog:index')
     return render(request, template, context)
 
-
-
-@login_required
-def add_comment(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
-    form = CommentForm(request.POST)
-
-    if form.is_valid():
-        comment = form.save(commit=False)
-        comment.author = request.user
-        comment.post = post
-        comment.save()
-
-    return redirect('blog:post_detail', pk=post_id)
-
-
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/detail.html'
@@ -92,6 +76,45 @@ class PostDetailView(DetailView):
         # Запрашиваем все поздравления для выбранного дня рождения.
         context['comments'] = self.object.comment.select_related('author')
         return context 
+    
+
+@login_required
+def add_comment(request, post_id):
+    form = CommentForm(request.POST)
+
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.author = request.user
+        comment.post = get_object_or_404(Post, pk=post_id)
+        comment.save()
+
+    return redirect('blog:post_detail', pk=post_id)
+
+@login_required
+def edit_comment(request, post_id, comment_id):
+    template = 'blog/comment.html'
+    instance = get_object_or_404(Comment, pk=comment_id)
+    form = CommentForm(request.POST, instance=instance)
+
+    context = {'form': form, 'comment':instance}
+    if form.is_valid():
+        form.save()
+        context.update({'form': form})
+        return redirect('blog:post_detail', pk=post_id)
+    return render(request, template, context)
+
+
+@login_required
+def delete_comment(request, post_id, comment_id):
+    template = 'blog/comment.html'
+    instance = get_object_or_404(Comment, pk=comment_id)
+    form = CommentForm()
+
+    context = {'form': form, 'comment':instance}
+    if request.method == 'POST':
+        instance.delete()
+        return redirect('blog:post_detail', pk=post_id)
+    return render(request, template, context)
 
 
 def category_posts(request, category_slug):
@@ -111,7 +134,7 @@ def category_posts(request, category_slug):
     context = {'page_obj': page_obj, 'category': category}
     return render(request, template, context)
 
-
+@login_required
 def user_profile(request, profile_username):
     template = 'blog/profile.html'
     profile = get_object_or_404(
@@ -125,18 +148,6 @@ def user_profile(request, profile_username):
     
     context = {'profile': profile, 'page_obj': page_obj}
     return render(request, template, context) 
-
-
-def single_comment(request, post_id=None, comment_id=None):
-    template = 'blog/comment.html'
-    if id is not None: instance = get_object_or_404(Post, pk=id)
-    else: instance = None
-    context = {'form' : form}
-    form = Comment(request.POST or None, instance=instance)
-    if form.is_valid():
-        context.update({'form' : form})
-        form.save()
-    return render(request, template, context)
 
 
 def registration(request):
