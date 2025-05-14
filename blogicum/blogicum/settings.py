@@ -25,9 +25,9 @@ SECRET_KEY = 'django-insecure-8dub52t@dq%7itbvpv@9z&+(a=occ+ni6!*qj1gjon@b+d$w@3
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-LOGIN_REDIRECT_URL = 'blog:index' 
+LOGIN_REDIRECT_URL = 'blog:index'
 
-MEDIA_ROOT = BASE_DIR / 'media' 
+MEDIA_ROOT = BASE_DIR / 'media'
 
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 
@@ -38,7 +38,7 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
 ]
 
-CSRF_FAILURE_VIEW = 'core.views.csrf_failure' 
+CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 
 # Application definition
 

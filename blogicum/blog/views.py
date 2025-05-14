@@ -43,8 +43,10 @@ def index(request):
 @login_required
 def create_edit_post(request, post_id=None):
     template = 'blog/create.html'
-    if post_id is not None: instance = get_object_or_404(Post, pk=post_id)
-    else: instance = None
+    if post_id is not None:
+        instance = get_object_or_404(Post, pk=post_id)
+    else:
+        instance = None
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
     context = {'form': form}
@@ -53,8 +55,10 @@ def create_edit_post(request, post_id=None):
         post.author = request.user
         post.save()
         context.update({'form': form})
-        if post_id == None: return redirect('blog:index')
-        else: return redirect('blog:post_detail', pk=post_id)
+        if post_id is None:
+            return redirect('blog:index')
+        else:
+            return redirect('blog:post_detail', pk=post_id)
     return render(request, template, context)
 
 
@@ -74,11 +78,12 @@ def post_delete(request, post_id):
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/detail.html'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm()
         context['comments'] = self.object.comment.select_related('author')
-        return context 
+        return context
 
 
 @login_required
@@ -129,7 +134,7 @@ def category_posts(request, category_slug):
     post_list = publication_check(post_list)
     post_list = comment_count(
         post_list, 'comment__id'
-        ).order_by('-created_at')
+    ).order_by('-created_at')
     page_obj = post_pagination(post_list, 10, request)
     context = {'page_obj': page_obj, 'category': category}
     return render(request, template, context)
@@ -142,14 +147,14 @@ def user_profile(request, profile_username):
     )
     post_list = Post.objects.filter(
             author__username = profile_username
-        )
+    )
     if request.user.username != profile_username:
         post_list = publication_check(post_list)
     post_list = comment_count(
         post_list, 'comment__id'
-        ).order_by('-created_at')
+    ).order_by('-created_at')
     page_obj = post_pagination(post_list, 10, request)
-    
+
     context = {'profile': profile, 'page_obj': page_obj}
     return render(request, template, context)
 
@@ -161,4 +166,3 @@ def registration(request):
     if form.is_valid():
         form.save()
     return render(request, template, context)
-
