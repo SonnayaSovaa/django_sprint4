@@ -7,17 +7,19 @@ from datetime import datetime
 from django.urls import reverse_lazy
 from django.views.generic import (CreateView,
 DeleteView, DetailView, ListView, UpdateView)
+from django.db.models import Count
 
 
 def post_pagination(post_list, obj_count, request):
-    paginator = Paginator(post_list, 10)
+    paginator = Paginator(post_list, obj_count)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     return page_obj
 
-def comment_count():
-    pass
 
+def comment_count(post_list, criteria):
+    post_list = post_list.annotate(comment_count=Count(criteria))
+    return post_list
 
 
 def index(request):
@@ -28,8 +30,9 @@ def index(request):
         pub_date__lte=datetime.now()
     ).order_by('-pub_date')
     
+    
+    post_list = comment_count(post_list, 'comment__id').order_by('-created_at')
     page_obj = post_pagination(post_list, 10, request)
-
     context = {'page_obj': page_obj}
     return render(request, template, context)
 
@@ -37,7 +40,8 @@ def index(request):
 @login_required
 def create_edit_post(request, post_id=None):
     template = 'blog/create.html'
-    instance = get_object_or_404(Post, pk=post_id)
+    if post_id is not None: instance = get_object_or_404(Post, pk=post_id)
+    else: instance = None
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
     context = {'form': form}
@@ -128,23 +132,23 @@ def category_posts(request, category_slug):
         category__slug=category_slug,
         pub_date__lte=datetime.now()
     )
-
+    post_list = comment_count(post_list, 'comment__id').order_by('-created_at')
     page_obj = post_pagination(post_list, 10, request)
 
     context = {'page_obj': page_obj, 'category': category}
     return render(request, template, context)
 
-@login_required
+
 def user_profile(request, profile_username):
     template = 'blog/profile.html'
     profile = get_object_or_404(
         User.objects, username=profile_username,
     )
-    pages = Post.objects.filter(
+    post_list = Post.objects.filter(
         author__username = profile_username
     )
-
-    page_obj = post_pagination(pages, 10, request)
+    post_list = comment_count(post_list, 'comment__id').order_by('-created_at')
+    page_obj = post_pagination(post_list, 10, request)
     
     context = {'profile': profile, 'page_obj': page_obj}
     return render(request, template, context) 
