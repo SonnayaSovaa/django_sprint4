@@ -27,7 +27,7 @@ urlpatterns = [
          ),
     path('posts/<int:post_id>/delete/', views.post_delete, name='delete_post'),
     path('posts/create/', views.create_edit_post, name='create_post'),
-    path('edit_profile/', views.registration, name='edit_profile'),
+    path('edit_profile/', views.edit_profile, name='edit_profile'),
     path('category/<slug:category_slug>/',
          views.category_posts, name='category_posts'),
     path('profile/<str:profile_username>/',

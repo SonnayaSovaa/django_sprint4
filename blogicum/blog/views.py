@@ -34,7 +34,7 @@ def index(request):
         category__is_published=True,
         pub_date__lte=datetime.now()
     ).order_by('-pub_date')
-    post_list = comment_count(post_list, 'comment__id').order_by('-created_at')
+    post_list = comment_count(post_list, 'comment__id').order_by('-pub_date')
     page_obj = post_pagination(post_list, 10, request)
     context = {'page_obj': page_obj}
     return render(request, template, context)
@@ -133,7 +133,7 @@ def category_posts(request, category_slug):
     post_list = publication_check(post_list)
     post_list = comment_count(
         post_list, 'comment__id'
-    ).order_by('-created_at')
+    ).order_by('-pub_date')
     page_obj = post_pagination(post_list, 10, request)
     context = {'page_obj': page_obj, 'category': category}
     return render(request, template, context)
@@ -151,10 +151,24 @@ def user_profile(request, profile_username):
         post_list = publication_check(post_list)
     post_list = comment_count(
         post_list, 'comment__id'
-    ).order_by('created_at')
+    ).order_by('-pub_date')
     page_obj = post_pagination(post_list, 10, request)
 
     context = {'profile': profile, 'page_obj': page_obj}
+    return render(request, template, context)
+
+
+@login_required
+def edit_profile(request):
+    template = 'blog/user.html'
+    user = get_object_or_404(
+        User.objects,username=request.user.username
+    )
+    form = UserForm(request.POST or None, instance=user)
+    context = {'form': form}
+    if form.is_valid():
+        form.save()
+        return redirect('blog:profile', request.user.username)
     return render(request, template, context)
 
 
@@ -164,4 +178,5 @@ def registration(request):
     context = {'form': form}
     if form.is_valid():
         form.save()
+        return redirect('blog:profile', request.user.username)
     return render(request, template, context)
