@@ -48,7 +48,7 @@ def create_edit_post(request, post_id=None):
         instance = get_object_or_404(Post.objects, pk=post_id)
     else:
         instance = None
-    if instance is not None and instance.author != request.user.username:
+    if instance is not None and instance.author != request.user:
         raise Http404('страница недоступна!')
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
@@ -69,7 +69,7 @@ def create_edit_post(request, post_id=None):
 def post_delete(request, post_id):
     template = 'blog/create.html'
     instance = get_object_or_404(Post, pk=post_id)
-    if instance is not None and instance.author != request.user.username:
+    if instance is not None and instance.author != request.user:
         raise Http404('страница недоступна!')
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
@@ -107,7 +107,7 @@ def add_comment(request, post_id):
 def edit_comment(request, post_id, comment_id):
     template = 'blog/comment.html'
     instance = get_object_or_404(Comment.objects, pk=comment_id)
-    if instance is not None and instance.author != request.user.username:
+    if instance.author != request.user:
         raise Http404('страница недоступна!')
     form = CommentForm(request.POST or None, instance=instance)
     context = {'form': form, 'comment': instance, 'user': request.user}
@@ -122,7 +122,7 @@ def edit_comment(request, post_id, comment_id):
 def delete_comment(request, post_id, comment_id):
     template = 'blog/comment.html'
     instance = get_object_or_404(Comment.objects, pk=comment_id)
-    if instance is not None and instance.author != request.user.username:
+    if instance is not None and instance.author != request.user:
         raise Http404('страница недоступна!')
     context = {'comment': instance, 'user': request.user}
     if request.method == 'POST':
