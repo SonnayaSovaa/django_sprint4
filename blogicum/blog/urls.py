@@ -15,12 +15,12 @@ urlpatterns = [
     path('posts/<int:post_id>/edit_comment/<comment_id>/', views.single_comment, name='edit_comment'),
     path('posts/<int:post_id>/delete_comment/<comment_id>/', views.single_comment, name='delete_comment'),
     
-    path('posts/<int:post_id>/edit/', views.post_delete, name='edit_post'), #!!!!!!
+    path('posts/<int:post_id>/edit/', views.create_edit_post, name='edit_post'),
 
-    path('posts/<int:post_id>/delete/', views.post_delete, name='delete_post'), #!!!!!
+    path('posts/<int:post_id>/delete/', views.post_delete, name='delete_post'),
 
     
-    path('posts/create/', views.create_post, name='create_post'),
+    path('posts/create/', views.create_edit_post, name='create_post'),
 
     path('edit_profile/', views.registration, name='edit_profile'),
 

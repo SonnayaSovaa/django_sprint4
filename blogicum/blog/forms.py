@@ -7,7 +7,7 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = '__all__'
+        fields = ['title', 'text', 'pub_date', 'location', 'category', 'image']
 
 
 class UserForm(forms.ModelForm):
@@ -21,3 +21,4 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['text',]
+

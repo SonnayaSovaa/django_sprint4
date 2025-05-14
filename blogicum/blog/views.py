@@ -35,6 +35,39 @@ def index(request):
 
 
 @login_required
+def create_edit_post(request, post_id=None):
+    template = 'blog/create.html'
+    instance = get_object_or_404(Post, pk=post_id)
+    form = PostForm(request.POST or None, instance=instance,
+                    files=request.FILES or None)
+    context = {'form': form}
+    if form.is_valid():
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
+        context.update({'form': form})
+        if post_id==None: return redirect('blog:index')
+        else: return redirect('blog:post_detail', pk=post_id)
+    return render(request, template, context)
+
+
+
+@login_required
+def post_delete(request, post_id):
+    template = 'blog/create.html'
+    instance = get_object_or_404(Post, pk=post_id)
+    form = PostForm(request.POST or None, instance=instance,
+                    files=request.FILES or None)
+    context = {'form' : form, 'post' : instance}
+
+    if request.method == 'POST':
+        instance.delete()
+        return redirect('blog:index')
+    return render(request, template, context)
+
+
+
+@login_required
 def add_comment(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     form = CommentForm(request.POST)
@@ -46,21 +79,6 @@ def add_comment(request, post_id):
         comment.save()
 
     return redirect('blog:post_detail', pk=post_id)
-
-'''
-def post_detail(request, post_id):
-    template = 'blog/detail.html'
-
-    post = get_object_or_404(Post, pk=post_id)
-
-    form = CommentForm(request.POST or None)
-
-    comments = Comment.objects.order_by('-created_at')
-    context = {'post': post, 'form': form, 'comments' : comments}
-    if form.is_valid():
-        form.save()
-    context.update({'form': form})
-    return render(request, template, context) '''
 
 
 class PostDetailView(DetailView):
@@ -74,23 +92,6 @@ class PostDetailView(DetailView):
         # Запрашиваем все поздравления для выбранного дня рождения.
         context['comments'] = self.object.comment.select_related('author')
         return context 
-
-
-
-
-def post_delete(request, post_id):
-    template = 'blog/detail.html'
-    redirection = 'blog/index.html'
-
-    instance = get_object_or_404(Post, pk=post_id)
-    form = CommentForm(request.POST or None)
-    context = {'form' : form, 'post' : instance}
-
-    if request.method == 'POST':
-        instance.delete()
-        return reverse_lazy('blog:index')
-    return render(request, template, context)
-
 
 
 def category_posts(request, category_slug):
@@ -109,23 +110,6 @@ def category_posts(request, category_slug):
 
     context = {'page_obj': page_obj, 'category': category}
     return render(request, template, context)
- 
-
-
-def create_post(request, post_id=None):
-    template = 'blog/create.html'
-    
-    if post_id is not None: instance = get_object_or_404(Post, pk=post_id)
-    else: instance = None
-
-    form = PostForm(request.POST or None, instance=instance,
-                    files=request.FILES or None)
-    context = {'form': form}
-    if form.is_valid():
-        form.save()
-        context.update({'form': form})
-    return render(request, template, context)
-
 
 
 def user_profile(request, profile_username):
