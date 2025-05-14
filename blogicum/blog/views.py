@@ -50,15 +50,16 @@ def create_edit_post(request, post_id=None):
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
     context = {'form': form, 'post': instance, 'user': request.user.username}
-    if form.is_valid():
-        post = form.save(commit=False)
-        post.author = request.user
-        post.save()
-        context.update({'form': form})
-        if post_id is None:
-            return redirect('blog:profile', request.user.username)
-        else:
-            return redirect('blog:post_detail', pk=post_id)
+    if instance.author == request.user.username:
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            context.update({'form': form})
+            if post_id is None:
+                return redirect('blog:profile', request.user.username)
+            else:
+                return redirect('blog:post_detail', pk=post_id)
     return render(request, template, context)
 
 
