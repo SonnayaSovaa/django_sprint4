@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from datetime import datetime
 from django.views.generic import DetailView
 from django.db.models import Count
+from django.http import Http404
 
 
 def post_pagination(post_list, obj_count, request):
@@ -40,19 +41,20 @@ def index(request):
     return render(request, template, context)
 
 
-@login_required
 def create_edit_post(request, post_id=None):
     template = 'blog/create.html'
     if post_id is not None:
         instance = get_object_or_404(Post.objects, pk=post_id)
     else:
-        instance = None
-    if instance is not None and instance.author != request.user:
-        return redirect('blog:post_detail', pk=post_id)
+        instance = None 
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
     context = {'form': form, 'post': instance, 'user': request.user}
     if form.is_valid():
+        if request.user.is_anonymous:
+            return redirect('blog:login')
+        if instance is not None and instance.author != request.user:
+            return redirect('blog:post_detail', pk=post_id)
         post = form.save(commit=False)
         post.author = request.user
         post.save()
@@ -60,10 +62,7 @@ def create_edit_post(request, post_id=None):
         if post_id is None:
             return redirect('blog:profile', request.user.username)
         else:
-            if request.user.is_authenticated:
-                return redirect('blog:post_detail', pk=post_id)
-            else:
-                return redirect('blog:login')
+            return redirect('blog:post_detail', pk=post_id)
     return render(request, template, context)
 
 
@@ -77,6 +76,10 @@ def post_delete(request, post_id):
                     files=request.FILES or None)
     context = {'form': form, 'post': instance, 'user': request.user}
     if request.method == 'POST':
+        if request.user.is_anonymous:
+            return redirect('blog:login')
+        if instance is not None and instance.author != request.user:
+            return redirect('blog:post_detail', pk=post_id)
         instance.delete()
         return redirect('blog:index')
     return render(request, template, context)
@@ -91,6 +94,11 @@ class PostDetailView(DetailView):
         context['form'] = CommentForm()
         context['comments'] = self.object.comment.select_related('author')
         context['user'] = self.request.user
+        if not (self.object.is_published):
+            if self.request.user.is_anonymous:
+                raise Http404('')
+            if self.object.author != self.request.user:
+                raise Http404('')
         return context
 
 
