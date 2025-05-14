@@ -50,7 +50,7 @@ def create_edit_post(request, post_id=None):
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
     context = {'form': form, 'post': instance, 'user': request.user.username}
-    if instance.author == request.user.username:
+    if instance is not None and instance.author == request.user.username:
         if form.is_valid():
             post = form.save(commit=False)
             post.author = request.user
