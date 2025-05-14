@@ -18,9 +18,5 @@ class UserForm(forms.ModelForm):
                   'last_name', 'email', 'date_joined']
 
 
-class CommentForm(forms.ModelForm):
+class CommentForm(forms.Form):
     text = forms.Textarea()
-
-    class Meta:
-        model = Comment
-        fields = ['text']
