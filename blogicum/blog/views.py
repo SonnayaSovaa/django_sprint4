@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from datetime import datetime
 from django.views.generic import DetailView
 from django.db.models import Count
+from django.http import Http404
 
 
 def post_pagination(post_list, obj_count, request):
@@ -44,9 +45,11 @@ def index(request):
 def create_edit_post(request, post_id=None):
     template = 'blog/create.html'
     if post_id is not None:
-        instance = get_object_or_404(Post, pk=post_id)
+        instance = get_object_or_404(Post.objects, pk=post_id)
     else:
         instance = None
+    if instance is not None and instance.author != request.user.username:
+        raise Http404('страница недоступна!')
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
     context = {'form': form, 'post': instance, 'user': request.user}
@@ -66,6 +69,8 @@ def create_edit_post(request, post_id=None):
 def post_delete(request, post_id):
     template = 'blog/create.html'
     instance = get_object_or_404(Post, pk=post_id)
+    if instance is not None and instance.author != request.user.username:
+        raise Http404('страница недоступна!')
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
     context = {'form': form, 'post': instance, 'user': request.user}
@@ -102,6 +107,8 @@ def add_comment(request, post_id):
 def edit_comment(request, post_id, comment_id):
     template = 'blog/comment.html'
     instance = get_object_or_404(Comment.objects, pk=comment_id)
+    if instance is not None and instance.author != request.user.username:
+        raise Http404('страница недоступна!')
     form = CommentForm(request.POST or None, instance=instance)
     context = {'form': form, 'comment': instance, 'user': request.user}
     if form.is_valid():
@@ -115,6 +122,8 @@ def edit_comment(request, post_id, comment_id):
 def delete_comment(request, post_id, comment_id):
     template = 'blog/comment.html'
     instance = get_object_or_404(Comment.objects, pk=comment_id)
+    if instance is not None and instance.author != request.user.username:
+        raise Http404('страница недоступна!')
     context = {'comment': instance, 'user': request.user}
     if request.method == 'POST':
         instance.delete()
