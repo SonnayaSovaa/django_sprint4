@@ -46,7 +46,7 @@ def create_edit_post(request, post_id=None):
     if post_id is not None:
         instance = get_object_or_404(Post.objects, pk=post_id)
     else:
-        instance = None 
+        instance = None
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
     context = {'form': form, 'post': instance, 'user': request.user}
