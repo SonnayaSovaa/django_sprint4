@@ -56,7 +56,7 @@ def create_edit_post(request, post_id=None):
         post.save()
         context.update({'form': form})
         if post_id is None:
-            return redirect('blog:index')
+            return redirect('blog:profile', request.user.username)
         else:
             return redirect('blog:post_detail', pk=post_id)
     return render(request, template, context)
@@ -114,8 +114,7 @@ def edit_comment(request, post_id, comment_id):
 def delete_comment(request, post_id, comment_id):
     template = 'blog/comment.html'
     instance = get_object_or_404(Comment, pk=comment_id)
-    form = CommentForm()
-    context = {'form': form, 'comment': instance}
+    context = {'comment': instance}
     if request.method == 'POST':
         instance.delete()
         return redirect('blog:post_detail', pk=post_id)
@@ -152,7 +151,7 @@ def user_profile(request, profile_username):
         post_list = publication_check(post_list)
     post_list = comment_count(
         post_list, 'comment__id'
-    ).order_by('-created_at')
+    ).order_by('created_at')
     page_obj = post_pagination(post_list, 10, request)
 
     context = {'profile': profile, 'page_obj': page_obj}

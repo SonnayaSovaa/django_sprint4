@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-8dub52t@dq%7itbvpv@9z&+(a=occ+ni6!*qj1gjon@b+d$w@3'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = not True
 
 LOGIN_REDIRECT_URL = 'blog:index'
 
