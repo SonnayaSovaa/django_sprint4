@@ -4,9 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .forms import CommentForm, PostForm, UserForm
 from django.core.paginator import Paginator
 from datetime import datetime
-from django.urls import reverse_lazy
-from django.views.generic import (CreateView,
-DeleteView, DetailView, ListView, UpdateView)
+from django.views.generic import DetailView
 from django.db.models import Count
 
 
@@ -22,6 +20,13 @@ def comment_count(post_list, criteria):
     return post_list
 
 
+def publication_check(post_list):
+    return post_list.filter(
+        is_published=True,
+        pub_date__lte=datetime.now()
+    )
+
+
 def index(request):
     template = 'blog/index.html'
     post_list = Post.objects.filter(
@@ -29,8 +34,6 @@ def index(request):
         category__is_published=True,
         pub_date__lte=datetime.now()
     ).order_by('-pub_date')
-    
-    
     post_list = comment_count(post_list, 'comment__id').order_by('-created_at')
     page_obj = post_pagination(post_list, 10, request)
     context = {'page_obj': page_obj}
@@ -50,10 +53,9 @@ def create_edit_post(request, post_id=None):
         post.author = request.user
         post.save()
         context.update({'form': form})
-        if post_id==None: return redirect('blog:index')
+        if post_id == None: return redirect('blog:index')
         else: return redirect('blog:post_detail', pk=post_id)
     return render(request, template, context)
-
 
 
 @login_required
@@ -62,45 +64,40 @@ def post_delete(request, post_id):
     instance = get_object_or_404(Post, pk=post_id)
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
-    context = {'form' : form, 'post' : instance}
-
+    context = {'form': form, 'post': instance}
     if request.method == 'POST':
         instance.delete()
         return redirect('blog:index')
     return render(request, template, context)
+
 
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/detail.html'
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # context['comments.count'] = post_comments(self.object.comments)
-        # Записываем в переменную form пустой объект формы.
         context['form'] = CommentForm()
-        # Запрашиваем все поздравления для выбранного дня рождения.
         context['comments'] = self.object.comment.select_related('author')
         return context 
-    
+
 
 @login_required
 def add_comment(request, post_id):
     form = CommentForm(request.POST)
-
     if form.is_valid():
         comment = form.save(commit=False)
         comment.author = request.user
         comment.post = get_object_or_404(Post, pk=post_id)
         comment.save()
-
     return redirect('blog:post_detail', pk=post_id)
+
 
 @login_required
 def edit_comment(request, post_id, comment_id):
     template = 'blog/comment.html'
     instance = get_object_or_404(Comment, pk=comment_id)
     form = CommentForm(request.POST, instance=instance)
-
-    context = {'form': form, 'comment':instance}
+    context = {'form': form, 'comment': instance}
     if form.is_valid():
         form.save()
         context.update({'form': form})
@@ -113,8 +110,7 @@ def delete_comment(request, post_id, comment_id):
     template = 'blog/comment.html'
     instance = get_object_or_404(Comment, pk=comment_id)
     form = CommentForm()
-
-    context = {'form': form, 'comment':instance}
+    context = {'form': form, 'comment': instance}
     if request.method == 'POST':
         instance.delete()
         return redirect('blog:post_detail', pk=post_id)
@@ -128,13 +124,13 @@ def category_posts(request, category_slug):
         is_published=True, created_at__lte=datetime.now()
     )
     post_list = Post.objects.filter(
-        is_published=True,
         category__slug=category_slug,
-        pub_date__lte=datetime.now()
     )
-    post_list = comment_count(post_list, 'comment__id').order_by('-created_at')
+    post_list = publication_check(post_list)
+    post_list = comment_count(
+        post_list, 'comment__id'
+        ).order_by('-created_at')
     page_obj = post_pagination(post_list, 10, request)
-
     context = {'page_obj': page_obj, 'category': category}
     return render(request, template, context)
 
@@ -145,13 +141,17 @@ def user_profile(request, profile_username):
         User.objects, username=profile_username,
     )
     post_list = Post.objects.filter(
-        author__username = profile_username
-    )
-    post_list = comment_count(post_list, 'comment__id').order_by('-created_at')
+            author__username = profile_username
+        )
+    if request.user.username != profile_username:
+        post_list = publication_check(post_list)
+    post_list = comment_count(
+        post_list, 'comment__id'
+        ).order_by('-created_at')
     page_obj = post_pagination(post_list, 10, request)
     
     context = {'profile': profile, 'page_obj': page_obj}
-    return render(request, template, context) 
+    return render(request, template, context)
 
 
 def registration(request):
@@ -161,3 +161,4 @@ def registration(request):
     if form.is_valid():
         form.save()
     return render(request, template, context)
+
