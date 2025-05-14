@@ -60,7 +60,10 @@ def create_edit_post(request, post_id=None):
         if post_id is None:
             return redirect('blog:profile', request.user.username)
         else:
-            return redirect('blog:post_detail', pk=post_id)
+            if request.user.is_authenticated:
+                return redirect('blog:post_detail', pk=post_id)
+            else:
+                return redirect('blog:login')
     return render(request, template, context)
 
 
