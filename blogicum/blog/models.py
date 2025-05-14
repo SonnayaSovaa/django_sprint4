@@ -87,9 +87,8 @@ class Post(BaseModel):
 
 
 class Comment(models.Model):
-    text = models.CharField(
-        'Текст комментария',
-        max_length=400,
+    text = models.TextField(
+        'Текст комментария'
     )
     post = models.ForeignKey(
         Post,
