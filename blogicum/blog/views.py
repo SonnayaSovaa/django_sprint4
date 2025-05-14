@@ -162,7 +162,7 @@ def user_profile(request, profile_username):
 def edit_profile(request):
     template = 'blog/user.html'
     user = get_object_or_404(
-        User.objects,username=request.user.username
+        User.objects, username=request.user.username
     )
     form = UserForm(request.POST or None, instance=user)
     context = {'form': form}
