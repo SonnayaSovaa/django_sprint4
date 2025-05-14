@@ -78,11 +78,11 @@ def post_delete(request, post_id):
 class PostDetailView(DetailView):
     model = Post
     template_name = 'blog/detail.html'
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = CommentForm()
         context['comments'] = self.object.comment.select_related('author')
+        context['user'] = self.request.user
         return context
 
 
