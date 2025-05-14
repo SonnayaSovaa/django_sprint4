@@ -48,7 +48,7 @@ def create_edit_post(request, post_id=None):
     else:
         instance = None
     if instance is not None and instance.author != request.user:
-        return redirect('blog:login')
+        return redirect('blog:post_detail', pk=post_id)
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
     context = {'form': form, 'post': instance, 'user': request.user}
