@@ -49,7 +49,7 @@ def create_edit_post(request, post_id=None):
         instance = None
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
-    context = {'form': form, 'post': instance, 'user': request.user.username}
+    context = {'form': form, 'post': instance, 'user': request.user}
     if form.is_valid():
         post = form.save(commit=False)
         post.author = request.user
@@ -68,7 +68,7 @@ def post_delete(request, post_id):
     instance = get_object_or_404(Post, pk=post_id)
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
-    context = {'form': form, 'post': instance}
+    context = {'form': form, 'post': instance, 'user': request.user}
     if request.method == 'POST':
         instance.delete()
         return redirect('blog:index')
@@ -103,7 +103,7 @@ def edit_comment(request, post_id, comment_id):
     template = 'blog/comment.html'
     instance = get_object_or_404(Comment.objects, pk=comment_id)
     form = CommentForm(request.POST or None, instance=instance)
-    context = {'form': form, 'comment': instance}
+    context = {'form': form, 'comment': instance, 'user': request.user}
     if form.is_valid():
         form.save()
         context.update({'form': form})
@@ -115,7 +115,7 @@ def edit_comment(request, post_id, comment_id):
 def delete_comment(request, post_id, comment_id):
     template = 'blog/comment.html'
     instance = get_object_or_404(Comment.objects, pk=comment_id)
-    context = {'comment': instance}
+    context = {'comment': instance, 'user': request.user}
     if request.method == 'POST':
         instance.delete()
         return redirect('blog:post_detail', pk=post_id)
