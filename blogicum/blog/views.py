@@ -6,7 +6,6 @@ from django.core.paginator import Paginator
 from datetime import datetime
 from django.views.generic import DetailView
 from django.db.models import Count
-from django.http import Http404
 
 
 def post_pagination(post_list, obj_count, request):
@@ -49,7 +48,7 @@ def create_edit_post(request, post_id=None):
     else:
         instance = None
     if instance is not None and instance.author != request.user:
-        return redirect('blog:logn')
+        return redirect('blog:login')
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
     context = {'form': form, 'post': instance, 'user': request.user}
@@ -70,7 +69,7 @@ def post_delete(request, post_id):
     template = 'blog/create.html'
     instance = get_object_or_404(Post, pk=post_id)
     if instance is not None and instance.author != request.user:
-        raise Http404('страница недоступна!')
+        return redirect('blog:login')
     form = PostForm(request.POST or None, instance=instance,
                     files=request.FILES or None)
     context = {'form': form, 'post': instance, 'user': request.user}
@@ -108,7 +107,7 @@ def edit_comment(request, post_id, comment_id):
     template = 'blog/comment.html'
     instance = get_object_or_404(Comment.objects, pk=comment_id)
     if instance.author != request.user:
-        raise Http404('страница недоступна!')
+        return redirect('blog:login')
     form = CommentForm(request.POST or None, instance=instance)
     context = {'form': form, 'comment': instance, 'user': request.user}
     if form.is_valid():
@@ -123,7 +122,7 @@ def delete_comment(request, post_id, comment_id):
     template = 'blog/comment.html'
     instance = get_object_or_404(Comment.objects, pk=comment_id)
     if instance is not None and instance.author != request.user:
-        raise Http404('страница недоступна!')
+        return redirect('blog:login')
     context = {'comment': instance, 'user': request.user}
     if request.method == 'POST':
         instance.delete()
