@@ -1,6 +1,7 @@
 from django import forms
 from django.forms import Textarea
 from .models import Comment, Post, User
+from django.contrib.auth.forms import UserCreationForm
 
 
 class PostForm(forms.ModelForm):

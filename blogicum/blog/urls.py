@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path
+from django.urls import path, reverse_lazy
 from blog import views
 from django.contrib.auth.views import (LoginView, LogoutView,
                                        PasswordChangeDoneView,
@@ -9,6 +9,8 @@ from django.contrib.auth.views import (LoginView, LogoutView,
                                        PasswordResetConfirmView,
                                        PasswordResetDoneView,
                                        PasswordResetView)
+from django.contrib.auth.forms import UserCreationForm
+from django.views.generic.edit import CreateView
 
 app_name = 'blog'
 template_str = 'registration/'
@@ -32,30 +34,36 @@ urlpatterns = [
          views.category_posts, name='category_posts'),
     path('profile/<str:profile_username>/',
          views.user_profile, name='profile'),
-    path('auth/registration/',
-         views.registration, name='registration'),
+    path('auth/registration/', 
+         CreateView.as_view(
+             template_name='registration/registration_form.html',
+             form_class=UserCreationForm,
+             success_url=reverse_lazy('blog:index'),
+             ),
+             name='registration',
+        ),
     path('auth/login/', LoginView.as_view(
         template_name=template_str + 'login.html'),
         name='login'),
     path('auth/logout/', LogoutView.as_view(
         template_name=template_str + 'logged_out.html'),
         name='logout'),
-    path('auth/password_change_done/', PasswordChangeDoneView.as_view(
+    path('auth/password_change/done/', PasswordChangeDoneView.as_view(
         template_name=template_str + 'password_change_done.html'),
         name='password_change_done'),
     path('auth/password_change/', PasswordChangeView.as_view(
         template_name=template_str + 'password_change_form.html'),
         name='password_change'),
-    path('auth/password_reset_complete/', PasswordResetCompleteView.as_view(
+    path('auth/password_reset/complete/', PasswordResetCompleteView.as_view(
         template_name=template_str + 'password_reset_complete.html'),
         name='password_reset_complete'),
-    path('auth/password_reset_confirm/', PasswordResetConfirmView.as_view(
+    path('auth/password_reset/confirm/', PasswordResetConfirmView.as_view(
         template_name=template_str + 'password_reset_confirm.html'),
         name='password_reset_confirm'),
-    path('auth/password_reset_done/', PasswordResetDoneView.as_view(
+    path('auth/password_reset/done/', PasswordResetDoneView.as_view(
         template_name=template_str + 'password_reset_done.html'),
         name='password_reset_done'),
-    path('auth/password_reset_form/', PasswordResetView.as_view(
+    path('auth/password_reset/', PasswordResetView.as_view(
         template_name=template_str + 'password_reset_form.html'),
-        name='password_reset_form'),
+        name='password_reset'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -190,13 +190,3 @@ def edit_profile(request):
         form.save()
         return redirect('blog:profile', request.user.username)
     return render(request, template, context)
-
-
-def registration(request):
-    template = 'registration/registration_form.html'
-    form = UserForm(request.POST or None, instance=None)
-    context = {'form': form}
-    if form.is_valid():
-        form.save()
-        return redirect('blog:profile', request.user.username)
-    return render(request, template, context)
