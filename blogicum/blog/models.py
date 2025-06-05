@@ -17,6 +17,9 @@ class Location(BaseModel):
         verbose_name = 'местоположение'
         verbose_name_plural = 'Местоположения'
 
+    def __str__(self):
+        return self.name
+
 
 class Category(BaseModel):
     title = models.CharField(
@@ -39,6 +42,9 @@ class Category(BaseModel):
     class Meta:
         verbose_name = 'категория'
         verbose_name_plural = 'Категории'
+
+    def __str__(self):
+        return self.title
 
 
 class Post(BaseModel):
@@ -84,6 +90,9 @@ class Post(BaseModel):
     class Meta:
         verbose_name = 'публикация'
         verbose_name_plural = 'Публикации'
+
+    def __str__(self):
+        return self.title
 
 
 class Comment(models.Model):
