@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import Textarea
+from django.forms import Textarea, DateInput
 from .models import Comment, Post, User
 from django.contrib.auth.forms import UserCreationForm
 
@@ -10,6 +10,7 @@ class PostForm(forms.ModelForm):
         model = Post
         fields = ['title', 'is_published', 'text',
                   'pub_date', 'location', 'category', 'image']
+        widgets={'pub_date': forms.DateInput(attrs={'type': 'datetime-local'}),}
 
 
 class UserForm(forms.ModelForm):
